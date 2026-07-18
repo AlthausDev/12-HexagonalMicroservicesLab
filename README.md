@@ -26,7 +26,10 @@ La intención no es construir una plataforma empresarial completa, sino aislar c
 │   └── order-service
 ├── docs
 │   ├── 01-hexagonal.md
-│   └── 02-microservices.md
+│   ├── 02-microservices.md
+│   ├── 03-roadmap.md
+│   └── 04-study-guide.md
+├── .github/workflows/build.yml
 ├── compose.yaml
 └── pom.xml
 ```
@@ -94,6 +97,8 @@ catalog-service :8081
 
 `order-service` no importa las clases internas de `catalog-service`. Solo conoce su contrato HTTP.
 
+Antes de hacer la llamada remota, el caso de uso valida los datos que puede comprobar localmente. Así evita consultar otro servicio cuando la petición ya es inválida.
+
 ### Ejecutar con Docker
 
 ```bash
@@ -127,7 +132,15 @@ Los tests importantes se ejecutan sin levantar Spring:
 
 - El caso de uso hexagonal se prueba con un repositorio falso.
 - El servicio de pedidos se prueba con un catálogo falso.
+- Se comprueba que una petición inválida no llegue a llamar al catálogo remoto.
 - La infraestructura se sustituye sin modificar la lógica central.
+
+## Integración continua
+
+GitHub Actions ejecuta dos comprobaciones:
+
+1. Compilación y pruebas con Maven.
+2. Construcción de las imágenes Docker y una prueba de humo real entre `order-service` y `catalog-service` mediante Docker Compose.
 
 ## Qué observar
 
@@ -137,4 +150,4 @@ Los tests importantes se ejecutan sin levantar Spring:
 4. Los microservicios tienen procesos, puertos y despliegues distintos.
 5. Un repositorio único no convierte los módulos en un monolito: la independencia se decide en ejecución y despliegue.
 
-Consulta los documentos de `docs/` antes de ampliar el laboratorio.
+Consulta la guía `docs/04-study-guide.md` para recorrer los ejemplos en orden.
