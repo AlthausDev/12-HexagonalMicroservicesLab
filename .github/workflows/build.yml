@@ -26,3 +26,50 @@ jobs:
 
       - name: Build and test
         run: mvn --batch-mode --no-transfer-progress clean verify
+
+      - name: Build Docker images
+        run: docker compose build
+
+      - name: Run Docker smoke test
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          cleanup() {
+            status=$?
+            if [ "$status" -ne 0 ]; then
+              docker compose logs
+            fi
+            docker compose down --volumes --remove-orphans
+          }
+          trap cleanup EXIT
+
+          docker compose up --detach
+
+          for attempt in {1..30}; do
+            if curl --fail --silent http://localhost:8081/actuator/health > /dev/null \
+              && curl --fail --silent http://localhost:8082/actuator/health > /dev/null; then
+              break
+            fi
+
+            if [ "$attempt" -eq 30 ]; then
+              echo "Services did not become healthy in time."
+              exit 1
+            fi
+
+            sleep 2
+          done
+
+          curl --fail --silent \
+            http://localhost:8081/api/products/HEX-BOOK \
+            > /tmp/product.json
+
+          curl --fail --silent \
+            --request POST \
+            --header "Content-Type: application/json" \
+            --data '{"sku":"HEX-BOOK","quantity":2}' \
+            http://localhost:8082/api/orders \
+            > /tmp/order.json
+
+          grep --quiet '"sku":"HEX-BOOK"' /tmp/product.json
+          grep --quiet '"sku":"HEX-BOOK"' /tmp/order.json
