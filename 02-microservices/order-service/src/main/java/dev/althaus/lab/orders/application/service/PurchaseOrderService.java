@@ -11,13 +11,13 @@ import dev.althaus.lab.orders.domain.PurchaseOrder;
 import java.util.List;
 import java.util.Objects;
 
-public final class CreatePurchaseOrderService
+public final class PurchaseOrderService
         implements CreatePurchaseOrderUseCase, QueryPurchaseOrderUseCase {
 
     private final CatalogGateway catalogGateway;
     private final PurchaseOrderRepository orderRepository;
 
-    public CreatePurchaseOrderService(
+    public PurchaseOrderService(
             CatalogGateway catalogGateway,
             PurchaseOrderRepository orderRepository
     ) {
@@ -27,9 +27,10 @@ public final class CreatePurchaseOrderService
 
     @Override
     public PurchaseOrder create(CreatePurchaseOrderCommand command) {
-        Objects.requireNonNull(command, "El comando es obligatorio.");
+        validate(command);
 
-        ProductSnapshot product = catalogGateway.findBySku(command.sku())
+        String normalizedSku = command.sku().trim().toUpperCase();
+        ProductSnapshot product = catalogGateway.findBySku(normalizedSku)
                 .orElseThrow(() -> new IllegalArgumentException(
                         "El producto no existe en catalog-service."
                 ));
@@ -45,5 +46,19 @@ public final class CreatePurchaseOrderService
     @Override
     public List<PurchaseOrder> findAll() {
         return orderRepository.findAll();
+    }
+
+    private static void validate(CreatePurchaseOrderCommand command) {
+        if (command == null) {
+            throw new IllegalArgumentException("El comando es obligatorio.");
+        }
+        if (command.sku() == null || command.sku().isBlank()) {
+            throw new IllegalArgumentException("El SKU es obligatorio.");
+        }
+        if (command.quantity() <= 0) {
+            throw new IllegalArgumentException(
+                    "La cantidad debe ser mayor que cero."
+            );
+        }
     }
 }

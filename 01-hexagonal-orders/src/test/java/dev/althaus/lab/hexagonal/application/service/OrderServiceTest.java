@@ -12,6 +12,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class OrderServiceTest {
 
@@ -33,6 +34,53 @@ class OrderServiceTest {
         assertThat(order.items()).hasSize(1);
         assertThat(order.total()).isEqualByComparingTo("39.90");
         assertThat(service.findById(order.id())).contains(order);
+    }
+
+    @Test
+    void rejectsOrderWithoutItems() {
+        OrderService service = new OrderService(new FakeOrderRepository());
+
+        assertThatThrownBy(() -> service.create(
+                new CreateOrderCommand("Sam", List.of())
+        ))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("El pedido debe contener al menos una línea.");
+    }
+
+    @Test
+    void rejectsBlankCustomerName() {
+        OrderService service = new OrderService(new FakeOrderRepository());
+
+        assertThatThrownBy(() -> service.create(
+                new CreateOrderCommand(
+                        "  ",
+                        List.of(new CreateOrderCommand.Item(
+                                "HEX-BOOK",
+                                1,
+                                new BigDecimal("19.95")
+                        ))
+                )
+        ))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("El nombre del cliente es obligatorio.");
+    }
+
+    @Test
+    void rejectsInvalidItemQuantity() {
+        OrderService service = new OrderService(new FakeOrderRepository());
+
+        assertThatThrownBy(() -> service.create(
+                new CreateOrderCommand(
+                        "Sam",
+                        List.of(new CreateOrderCommand.Item(
+                                "HEX-BOOK",
+                                0,
+                                new BigDecimal("19.95")
+                        ))
+                )
+        ))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("La cantidad debe ser mayor que cero.");
     }
 
     private static final class FakeOrderRepository implements OrderRepository {

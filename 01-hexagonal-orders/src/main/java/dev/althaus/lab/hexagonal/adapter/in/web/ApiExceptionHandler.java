@@ -10,13 +10,17 @@ import java.util.Map;
 @RestControllerAdvice
 public class ApiExceptionHandler {
 
-    @ExceptionHandler({
-            IllegalArgumentException.class,
-            NullPointerException.class
-    })
-    ResponseEntity<Map<String, String>> handleBadRequest(RuntimeException exception) {
+    @ExceptionHandler(IllegalArgumentException.class)
+    ResponseEntity<Map<String, String>> handleBadRequest(
+            IllegalArgumentException exception
+    ) {
+        String message = exception.getMessage();
+        if (message == null || message.isBlank()) {
+            message = "Solicitud inválida.";
+        }
+
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
-                .body(Map.of("error", exception.getMessage()));
+                .body(Map.of("error", message));
     }
 }
