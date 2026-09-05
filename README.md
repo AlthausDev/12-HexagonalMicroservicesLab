@@ -1,4 +1,4 @@
-# 12-HexagonalMicroservicesLab
+# Hexagonal Microservices Lab
 
 Laboratorio práctico para **aterrizar** arquitectura hexagonal, microservicios y Docker mediante ejemplos pequeños en Java y Spring Boot.
 
@@ -151,3 +151,9 @@ GitHub Actions ejecuta dos comprobaciones:
 5. Un repositorio único no convierte los módulos en un monolito: la independencia se decide en ejecución y despliegue.
 
 Consulta la guía `docs/04-study-guide.md` para recorrer los ejemplos en orden.
+
+## Licencia y atribución
+
+Publicado bajo la [Licencia MIT](LICENSE).
+
+Si reutilizas una parte sustancial del laboratorio, conserva el aviso de licencia y agradezco una referencia a **Sam Althaus / AlthausDev** y al repositorio original.
