@@ -142,15 +142,19 @@ GitHub Actions ejecuta dos comprobaciones:
 1. Compilación y pruebas con Maven.
 2. Construcción de las imágenes Docker y una prueba de humo real entre `order-service` y `catalog-service` mediante Docker Compose.
 
-## Qué observar
+## Principios que demuestra
 
-1. Los paquetes `domain` y `application` no dependen de controladores ni de clientes HTTP.
-2. Los puertos describen capacidades: guardar pedidos o consultar productos.
-3. Los adaptadores contienen los detalles: memoria, HTTP y JSON.
-4. Los microservicios tienen procesos, puertos y despliegues distintos.
-5. Un repositorio único no convierte los módulos en un monolito: la independencia se decide en ejecución y despliegue.
+1. Las dependencias apuntan hacia el dominio y los casos de uso, no hacia los frameworks.
+2. Los puertos expresan capacidades y contratos; los adaptadores resuelven detalles concretos.
+3. Separar repositorios no crea microservicios, y compartir repositorio no crea un monolito: la independencia real está en procesos, contratos y despliegue.
+4. La validación local debe ocurrir antes de depender de una llamada remota cuando sea posible.
+5. La infraestructura debe poder sustituirse sin reescribir la lógica central.
 
-Consulta la guía `docs/04-study-guide.md` para recorrer los ejemplos en orden.
+Consulta la guía [`docs/04-study-guide.md`](docs/04-study-guide.md) para recorrer los ejemplos en orden.
+
+## Estado
+
+Laboratorio activo de aprendizaje. El objetivo es añadir conceptos de forma incremental sin convertirlo en una demostración artificialmente grande.
 
 ## Licencia y atribución
 
